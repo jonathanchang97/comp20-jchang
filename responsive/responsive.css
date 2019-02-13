@@ -1,1 +1,66 @@
- 
+/* responsive.css */ 
+html body {
+  height: 100%;
+  top: 0;
+  background-color: white;
+}
+
+@media screen and (min-width: 1600px) { 
+  .homer {
+    width:312px; height:312px;
+    background:url(homer.jpg) 0px 0px;
+  }
+}
+
+@media screen 
+  and (min-width: 1400px) 
+  and (max-width: 1600px) { 
+  .homer {
+    width:312px; height:312px;
+    background:url(homer.jpg) 312px 0px;
+  }
+}
+
+@media screen 
+  and (min-width: 1200px) 
+  and (max-width: 1400px) { 
+  .homer {
+    width:312px; height:312px;
+    background:url(homer.jpg) 0px -312px;
+  }
+}
+
+@media screen 
+  and (min-width: 1000px) 
+  and (max-width: 1200px) { 
+  .homer {
+    width:312px; height:312px;
+    background:url(homer.jpg) 312px -312px;
+  }
+}
+
+@media screen 
+  and (min-width: 800px) 
+  and (max-width: 1000px) { 
+  .homer {
+    width:312px; height:312px;
+    background:url(homer.jpg) 0px -312px;
+  }
+}
+
+@media screen 
+  and (min-width: 600px) 
+  and (max-width: 800px) { 
+  .homer {
+    width:312px; height:312px;
+    background:url(homer.jpg) 312px 0px;
+  }
+}
+
+@media screen 
+  and (max-width: 600px) { 
+  .homer {
+    width:312px; height:312px;
+    background:url(homer.jpg) 0px 0px;
+  }
+}

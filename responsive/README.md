@@ -8,4 +8,4 @@
     No collaboration or discussions.
     
 *   Say approximately how many hours you have spent completing the assignment: 
-    2 hours.
+    1 hour.
