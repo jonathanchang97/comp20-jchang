@@ -14,7 +14,34 @@
 <div id="lyrics"></div>
 
 <script>
-	// Complete this section and create a CSS file named style.css
+	var video = document.getElementById("butwehavethepower");
+
+	var lyrics = document.getElementById("lyrics");
+  
+  video.addEventListener("timeupdate", function() {
+
+    if (video.currentTime > 5 && video.currentTime <= 16)
+		  lyrics.innerHTML = "Lisa:<br>Come gather round, children,<br>It's high time ye learned<br>'Bout a hero named Homer<br>And a devil named Burns.";
+    else if (video.currentTime > 16 && video.currentTime <= 27.5)
+		  lyrics.innerHTML = "We'll march 'till we drop<br>The girls and the fellas.<br>We'll fight 'till the death<br>Or else fold like umbrellas.";
+		else if (video.currentTime > 37 && video.currentTime <= 44.5)
+			lyrics.innerHTML = "So we'll march day and night<br>By the big cooling tower.<br>They have the plant";
+		else if (video.currentTime > 44.5 && video.currentTime <= 49)
+		  lyrics.innerHTML = "But we have the power.";
+		else if (video.currentTime > 52 && video.currentTime <= 55)
+			lyrics.innerHTML = "Lenny:<br>Now do \"Classical Gas!\"";
+		else if (video.currentTime > 72 && video.currentTime <= 79)
+			lyrics.innerHTML = "So we'll march day and night<br>By the big cooling tower.<br>They have the plant";
+		else if (video.currentTime > 79 && video.currentTime <= 81.5)
+		  lyrics.innerHTML = "But we have the power.";
+		else if (video.currentTime > 81.5 && video.currentTime <= 88.5)
+			lyrics.innerHTML = "So we'll march day and night<br>By the big cooling tower.<br>They have the plant";
+		else if (video.currentTime > 88.5 && video.currentTime <= 92)
+		  lyrics.innerHTML = "But we have the power.";
+		else
+			lyrics.innerHTML = "";
+
+		}, false);
 </script>
 </body>
 </html>
