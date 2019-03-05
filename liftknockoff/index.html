@@ -24,7 +24,27 @@
 		var map;
 		var users;
 		var marker;
+		var location;
 		var infowindow = new google.maps.InfoWindow();
+			
+		var icons = {
+			vehicle: {
+				url: "images/car.png",
+				scaledSize: new google.maps.Size(50, 50)
+			},
+      passenger: {
+				url: "images/passenger.png",
+				scaledSize: new google.maps.Size(50, 50)
+			},
+      weinermobile: {
+				url: "images/weinermobile.png",
+				scaledSize: new google.maps.Size(50, 50)
+			},
+			self: {
+				url: "images/yoshi.png",
+				scaledSize: new google.maps.Size(50, 50)
+      }
+    }
     
 		function init()
 		{
@@ -48,20 +68,8 @@
 		  me = new google.maps.LatLng(myLat, myLng);
       makeRequest();
 		  map.panTo(me);
-      
-      // Create a marker
-      marker = new google.maps.Marker({
-        position: me,
-        title: 'XdZjKMkR'
-      });
-      marker.setMap(map);
-			marker.setIcon('images/yoshi.png');
-
-      // Open info window on click of marker
-      google.maps.event.addListener(marker, 'click', function() {
-        infowindow.setContent(marker.title);
-        infowindow.open(map, marker);
-      });
+				
+			addMarkers();
     }
 
     function makeRequest()
@@ -82,6 +90,43 @@
       
       xhr.send("username=XdZjKMkR&lat=" + myLat + "&lng=" + myLng);
     }
+			
+		function addMarkers()
+		{
+			// Create self marker
+      marker = new google.maps.Marker({
+        position: me,
+        title: 'XdZjKMkR',
+				distance: 0
+      });
+      marker.setMap(map);
+			marker.setIcon(icons['self']);
+
+      // Open info window on click of marker
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(marker.title);
+        infowindow.open(map, marker);
+      });
+				
+				
+			if (users.vehicles) {
+	    	for (i = 0; i < users.passengers.length; i += 1) {
+      		addOtherUsers('passenger', users.passengers[i]);	
+				}
+			}
+				
+			if (users.passengers) {
+				for (i = 0; i < users.vehicles.length; i += 1) {
+					addOtherUsers('vehicle', users.vehicles[i]);
+    		}					
+			}
+		}
+			
+		function addOtherUsers(type, user)
+		{
+			location = new google.maps.LatLng(user.lat, user.lng);		
+		}
+			
   </script> 
 </body>
 </html>
