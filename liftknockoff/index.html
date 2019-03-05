@@ -32,6 +32,7 @@
 		{
 		  map = new google.maps.Map(document.getElementById("map"), myOptions);
 			getMyLocation();
+			renderMap();
     }
 			
 		function getMyLocation() {
@@ -39,7 +40,6 @@
         navigator.geolocation.getCurrentPosition(function(position) {
           myLat = position.coords.latitude;
 					myLng = position.coords.longitude;
-				  renderMap();
 				});
 		  }
       else
@@ -57,6 +57,7 @@
         title: "Here I Am!"
       });
       marker.setMap(map);
+			//market.setIcon
 
       // Open info window on click of marker
       google.maps.event.addListener(marker, 'click', function() {
@@ -77,7 +78,7 @@
         var users;
         if (xhr.readyState === 4 && xhr.status === 200) {
           users = JSON.parse(xhr.responseText);
-          //placeMarkers(map, icons, me, users);
+          //placeMarkers(icons, me, users);
         } 
         else if (xhr.readyState === 4 && xhr.status !== 200)
           alert("Error: XML request went wrong");
