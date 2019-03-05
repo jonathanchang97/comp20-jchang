@@ -3,55 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assignment 2</title>
+  <title>The Private Car Service</title>
   <link rel="stylesheet" href="css/styles.css">
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXOxRAOjwexv94hL59aY-5Xe4wkI8kX0M"></script>
-  <script>
-			function init()
-			{
-				// Faneuil Hall
-				var landmark = new google.maps.LatLng(42.3599611, -71.0567528);
-
-				// Set up map
-				var myOptions = {
-					zoom: 13, // The larger the zoom number, the bigger the zoom
-					center: landmark,
-					mapTypeId: google.maps.MapTypeId.ROADMAP
-				};
-
-				// Create the map in the "map_canvas" <div>
-				var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-
-				// Create a marker				
-				var marker = new google.maps.Marker({
-					position: landmark,
-					title: "Faneuil Hall, Boston, MA"
-				});
-				marker.setMap(map);
-				
-        // This is a global info window...
-				var infowindow = new google.maps.InfoWindow();
-
-				// Open info window on click of marker
-				google.maps.event.addListener(marker, 'click', function() {
-					infowindow.setContent(marker.title);
-					infowindow.open(map, marker);
-				});
-			}
-  </script> 
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXOxRAOjwexv94hL59aY-5Xe4wkI8kX0M&libraries=geometry"></script>
 </head>
   
 <body onload="init()">
-  <!--
-    XdZjKMkR is username
-    <p>You must use the JavaScript navigator.geolocation object to retrieve your geolocation information (latitude and longitude).</p>
-    <p>You must use the JavaScript XMLHttpRequest object to make requests (i.e., send your information) and manage the response data.</p>
-    <p>After retrieving your location using the navigator.geolocation JavaScript object, you must display your location on the map with unique marker (i.e., using an image of your choice) with an info window showing: </p>
-    <p>Your username and distance away (in miles) to nearest vehicle or passenger.</p>
-    <p>Your distance away (in miles) to the Weinermobile if it exists.</p>
-  -->
+  <!--XdZjKMkR is username-->
   
-  <div id="map_canvas"></div> 
-  
+  <div id="map"></div>
+	<script>
+		var myLat = 0;
+		var myLng = 0;
+		var me = new google.maps.LatLng(myLat, myLng);
+			
+    var myOptions = {
+		  zoom: 13, // The larger the zoom number, the bigger the zoom
+		  center: me,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		};
+
+		var map;
+		var marker;
+
+		var infowindow = new google.maps.InfoWindow();
+    
+		function init()
+		{
+		  map = new google.maps.Map(document.getElementById("map"), myOptions);
+			getMyLocation();
+    }
+			
+		function getMyLocation() {
+		  if (navigator.geolocation) { // the navigator.geolocation object is supported on your browser
+        navigator.geolocation.getCurrentPosition(function(position) {
+          myLat = position.coords.latitude;
+					myLng = position.coords.longitude;
+				  renderMap();
+				});
+		  }
+      else
+        alert("Geolocation is not supported by your web browser.  What a shame!");
+		}
+			
+		function renderMap() {
+		  me = new google.maps.LatLng(myLat, myLng);
+      makeRequest();
+		  map.panTo(me);
+      
+      // Create a marker
+      marker = new google.maps.Marker({
+        position: me,
+        title: "Here I Am!"
+      });
+      marker.setMap(map);
+
+      // Open info window on click of marker
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(marker.title);
+        infowindow.open(map, marker);
+      });
+    }
+
+    function makeRequest()
+    {
+      "use strict";
+      var xhr = new XMLHttpRequest();
+      
+      xhr.open("Post", "https://hans-moleman.herokuapp.com/rides", true);
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      
+      xhr.onreadystatechange = function () {
+        var users;
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          users = JSON.parse(xhr.responseText);
+          //placeMarkers(map, icons, me, users);
+        } 
+        else if (xhr.readyState === 4 && xhr.status !== 200)
+          alert("Error: XML request went wrong");
+      };
+      
+      xhr.send("username=XdZjKMkR&lat=" + myLat + "&lng=" + myLng);
+    }
+  </script> 
 </body>
 </html>
