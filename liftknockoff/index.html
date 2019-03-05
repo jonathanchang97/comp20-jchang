@@ -9,12 +9,10 @@
 </head>
   
 <body onload="init()">
-  <!--XdZjKMkR is username-->
   
   <div id="map"></div>
 	<script>
-		var myLat = 0;
-		var myLng = 0;
+		var myLat = 0, myLng = 0;
 		var me = new google.maps.LatLng(myLat, myLng);
 			
     var myOptions = {
@@ -24,15 +22,14 @@
 		};
 
 		var map;
+		var users;
 		var marker;
-
 		var infowindow = new google.maps.InfoWindow();
     
 		function init()
 		{
 		  map = new google.maps.Map(document.getElementById("map"), myOptions);
 			getMyLocation();
-			renderMap();
     }
 			
 		function getMyLocation() {
@@ -40,6 +37,7 @@
         navigator.geolocation.getCurrentPosition(function(position) {
           myLat = position.coords.latitude;
 					myLng = position.coords.longitude;
+					renderMap();
 				});
 		  }
       else
@@ -54,10 +52,10 @@
       // Create a marker
       marker = new google.maps.Marker({
         position: me,
-        title: "Here I Am!"
+        title: 'XdZjKMkR'
       });
       marker.setMap(map);
-			//market.setIcon
+			marker.setIcon('images/yoshi.png');
 
       // Open info window on click of marker
       google.maps.event.addListener(marker, 'click', function() {
@@ -75,10 +73,8 @@
       xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       
       xhr.onreadystatechange = function () {
-        var users;
         if (xhr.readyState === 4 && xhr.status === 200) {
           users = JSON.parse(xhr.responseText);
-          //placeMarkers(icons, me, users);
         } 
         else if (xhr.readyState === 4 && xhr.status !== 200)
           alert("Error: XML request went wrong");
