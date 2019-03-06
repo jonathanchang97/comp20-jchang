@@ -13,26 +13,25 @@
   <div id="map"></div>
 	<script>
 		var myLat = 0, myLng = 0;
-		var me = new google.maps.LatLng(myLat, myLng);
+		var myLocation = new google.maps.LatLng(myLat, myLng);
 			
     var myOptions = {
-		  zoom: 13, // The larger the zoom number, the bigger the zoom
-		  center: me,
+		  zoom: 15, // The larger the zoom number, the bigger the zoom
+		  center: myLocation,
 			mapTypeId: google.maps.MapTypeId.ROADMAP
 		};
 
 		var map;
 		var users;
-		var marker;
-		var location;
+		var myMarker;
 		var infowindow = new google.maps.InfoWindow();
 			
 		var icons = {
-			vehicle: {
+			vehicles: {
 				url: "images/car.png",
 				scaledSize: new google.maps.Size(50, 50)
 			},
-      passenger: {
+      passengers: {
 				url: "images/passenger.png",
 				scaledSize: new google.maps.Size(50, 50)
 			},
@@ -65,11 +64,9 @@
 		}
 			
 		function renderMap() {
-		  me = new google.maps.LatLng(myLat, myLng);
+		  myLocation = new google.maps.LatLng(myLat, myLng);
       makeRequest();
-		  map.panTo(me);
-				
-			addMarkers();
+		  map.panTo(myLocation);
     }
 
     function makeRequest()
@@ -81,50 +78,71 @@
       xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       
       xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
+        if (xhr.readyState == 4 && xhr.status == 200) {
           users = JSON.parse(xhr.responseText);
-        } 
-        else if (xhr.readyState === 4 && xhr.status !== 200)
+					addMarkers();
+				}
+        else if (xhr.readyState == 4 && xhr.status != 200)
           alert("Error: XML request went wrong");
       };
-      
+				
       xhr.send("username=XdZjKMkR&lat=" + myLat + "&lng=" + myLng);
     }
 			
 		function addMarkers()
 		{
 			// Create self marker
-      marker = new google.maps.Marker({
-        position: me,
+      myMarker = new google.maps.Marker({
+        position: myLocation,
         title: 'XdZjKMkR',
 				distance: 0
       });
-      marker.setMap(map);
-			marker.setIcon(icons['self']);
+      myMarker.setMap(map);
+			myMarker.setIcon(icons['self']);
 
       // Open info window on click of marker
-      google.maps.event.addListener(marker, 'click', function() {
-        infowindow.setContent(marker.title);
-        infowindow.open(map, marker);
+      google.maps.event.addListener(myMarker, 'click', function() {
+        infowindow.setContent(myMarker.title);
+        infowindow.open(map, myMarker);
       });
-				
-				
-			if (users.vehicles) {
-	    	for (i = 0; i < users.passengers.length; i += 1) {
-      		addOtherUsers('passenger', users.passengers[i]);	
+			console.log(users);
+			if (users.hasOwnProperty('vehicles')) {
+	    	for (i = 0; i < users.vehicles.length; i++) {
+      		addOtherUsers('vehicles', users.vehicles[i]);
 				}
 			}
-				
-			if (users.passengers) {
-				for (i = 0; i < users.vehicles.length; i += 1) {
-					addOtherUsers('vehicle', users.vehicles[i]);
+			if (users.hasOwnProperty('passengers')) {
+				for (i = 0; i < users.passengers.length; i++) {
+					addOtherUsers('passengers', users.passengers[i]);
     		}					
 			}
 		}
 			
 		function addOtherUsers(type, user)
 		{
-			location = new google.maps.LatLng(user.lat, user.lng);		
+			// ADD CODE FOR WEINERMOBILE
+				
+			var location = new google.maps.LatLng(user.lat, user.lng);
+			var userDistance = google.maps.geometry.spherical.computeDistanceBetween(location, myLocation);
+			// convert to miles
+			userDistance *= 0.000621371;
+			// Round to two decimal places
+			userDistance = Math.round(userDistance * 100) / 100;
+			
+			var marker = new google.maps.Marker({
+				position: location, 
+				title: user.username,
+				distance: userDistance
+			}); 
+				
+			marker.setMap(map);
+			marker.setIcon(icons[type]);
+				
+      // Open info window on click of marker
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(this.title + " is " + this.distance + " miles away");
+        infowindow.open(map, this);
+      });
 		}
 			
   </script> 
