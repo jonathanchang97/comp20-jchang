@@ -67,13 +67,12 @@
 			
 		function renderMap() {
 		  myLocation = new google.maps.LatLng(myLat, myLng);
-      makeRequest();
+      httpRequest();
 		  map.panTo(myLocation);
     }
 
-    function makeRequest()
+    function httpRequest()
     {
-      "use strict";
       var xhr = new XMLHttpRequest();
       
       xhr.open("Post", "https://hans-moleman.herokuapp.com/rides", true);
@@ -160,7 +159,6 @@
         infowindow.open(map, this);
       });
 		}
-			
   </script> 
 </body>
 </html>
