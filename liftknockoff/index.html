@@ -24,6 +24,8 @@
 		var map;
 		var users;
 		var myMarker;
+		var closestUser = "", closestDistance = Infinity;
+		var weinermobileExists = false, weinermobileDistance = 0;
 		var infowindow = new google.maps.InfoWindow();
 			
 		var icons = {
@@ -100,12 +102,6 @@
       myMarker.setMap(map);
 			myMarker.setIcon(icons['self']);
 
-      // Open info window on click of marker
-      google.maps.event.addListener(myMarker, 'click', function() {
-        infowindow.setContent(myMarker.title);
-        infowindow.open(map, myMarker);
-      });
-			console.log(users);
 			if (users.hasOwnProperty('vehicles')) {
 	    	for (i = 0; i < users.vehicles.length; i++) {
       		addOtherUsers('vehicles', users.vehicles[i]);
@@ -116,18 +112,30 @@
 					addOtherUsers('passengers', users.passengers[i]);
     		}					
 			}
+				
+			// Open info window on click of marker
+      google.maps.event.addListener(myMarker, 'click', function() {
+				if (weinermobileExists)
+					infowindow.setContent(myMarker.title + ": " + closestUser + " is " + closestDistance + " miles away and The Weinermobile is " +  weinermobileDistance + " away from me!");
+				else
+        	infowindow.setContent(myMarker.title + ": " + closestUser + " is " + closestDistance + " miles away and The Weinermobile is nowhere to be seen");
+        infowindow.open(map, myMarker);
+      });
 		}
 			
 		function addOtherUsers(type, user)
-		{
-			// ADD CODE FOR WEINERMOBILE
-				
+		{				
 			var location = new google.maps.LatLng(user.lat, user.lng);
 			var userDistance = google.maps.geometry.spherical.computeDistanceBetween(location, myLocation);
 			// convert to miles
 			userDistance *= 0.000621371;
 			// Round to two decimal places
 			userDistance = Math.round(userDistance * 100) / 100;
+				
+			if (userDistance < closestDistance) {
+	      closestDistance = userDistance;
+	      closestUser = user.username;
+			}
 			
 			var marker = new google.maps.Marker({
 				position: location, 
@@ -136,7 +144,15 @@
 			}); 
 				
 			marker.setMap(map);
-			marker.setIcon(icons[type]);
+				
+			// Weinermobile
+			if (user.username == "WEINERMOBILE") {
+					marker.setIcon(icons['weinermobile']);
+					weinermobileExists = true;
+					weinermobileDistance = userDistance;
+			}
+			else
+				marker.setIcon(icons[type]);
 				
       // Open info window on click of marker
       google.maps.event.addListener(marker, 'click', function() {
