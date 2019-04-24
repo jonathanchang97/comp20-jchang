@@ -6,3 +6,8 @@
 *   bullet
 3) Say approximately how many hours you have spent completing the assignment.
 *   bullet
+
+
+To Change:
+make the different sections an ordered list
+

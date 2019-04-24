@@ -7,21 +7,70 @@
 </head>
 <body>
 	<h2>1. Introduction</h2>
-	<p>The product I am being hired to test and document is a web application that uses Node.js, Express.js, and MongoDB to create an app that stores and sends data about passenger and driver locations in a car-sharing service.  My job is to document and resolve the security and privacy issues within this app</p>
+	<p>The product I am being hired to test and document is a web application that uses Node.js, Express.js, and MongoDB to create an app that stores and sends data about passenger and driver locations in a car-sharing service.  My job is to document and resolve the security and privacy issues within this app.</p>
 
 	<h2>2. Methodology</h2>
-	<p></p>
+	<p>In order to perform my penetration tests, I used OWASP Zed Attack Proxy (ZAP) to find basic vulnerabilities.  The attacks I performed on this application are directly specific with MongoDB.  Unless a SQL-based database, SQL injections are not possible.  However, MongoDB is very susceptible to attacks such as Cross-Site Scripting and MongoDB injection.  I penetrated the application by sending a script for the POST request and used the GET request meant to return user data.  It was possible to enter values that returned data not meant for the user.  Also, I observed the regular GET request that allowed the user to receive private information about the user like their location.</p>
 
 	<h2>3. Abstract of Findings</h2>
-	<p></p>
+	<h3>There were a number of security and privacy issues found within this application.</h3>
+  <ol>
+    <li><p>This app is suspectible to Cross-Site Scripting due to missing the X-XSS-Protection HTTP response header.  Cross-Site Scripting allows a user to send a script to the server to be executed.  This can be dangerous because the user could use this to make the server send back confidential data from the database.  It could also create a redirect to a dangerous website or a familiar site to another user where a login is required and sensitive information could be obtained by a hacker.</p></li>
+    <li><p>This app is also vulnerable to a MongoDB Injection.  This allows a user to send an input that returns data they don't have permission to access.</p></li>
+    <li><p>Lastly, this app is suspectible to privacy concerns.  Upon initial loading of the page, the information for all the vehicles that have checked in have their latitude and longitude on display, which would allow an attacker to find the current location of vehicles.  This opens up all sorts of security issues and dangerous if an attacker wanted the location of people.</p></li>
+  </ol> 
 
 	<h2>4. Issues Found</h2>
-	<p></p>
+	<h3>Issue One</h3>
+  <ul>
+    <li><p>Issue: Susceptible to Cross-Site Scripting</p></li>
+    <li><p>Page: Found on the main page that is called from the loading of the initial page</p></li>
+    <li><p>Severity: Low.  OWASP found that there is an issue with "Web Browser XSS Protection Not Enabled".  It marks it as low risk without much security problems it could raise.  The X-XSS-Protection HTTP response header allows the web server to enable or disable the web browser's XSS protection mechanism. You could enable this with the following:</p>
+    <ul>
+      <li><p>X-XSS-Protection: 1; mode=block</p></li>
+      <li><p>X-XSS-Protection: 1; report=http://www.example.com/xss</p></li>
+    </ul>
+    <p>I also attempted to use cross-site scripting on this page, but couldn't attack the pages that returned JSON or since the homepage doesn't take queries.  I looked into cross-site scripting a bunch and while the app is not currently vulnerable, if pages that take queries used HTML, they would be severely vulnerable to XSS.  The reason that this could be a severe issue is if an attack caused the site to redirect to a malicious website that planted a virus or tricked you into entering credentials, the hacker could cause serious damage to the user.  The hacker could also change the content of a more complex page to display defacing content if the website is every built upon further.</p></li>
+    <li><p>Description: We talked about this issue in class and I also read the links about XSS on the course website. The header issue was found by OWASP and researched further at https://geekflare.com/http-header-implementation/</p></li>
+    <li><p>Proof of vulnerability:</p></li>
+    <img src="owaspXSS.PNG" alt="owaspXSS">
+    <li><p>Resolution: Enabling the X-XSS-Protection HTTP response header with the following lines of code would enable the we browser's XSS protection mechanism.  Also, for XSS protection, by type-checking the data as a valid, limited-character string rather just any type, XSS can be prevented.</p></li>
+  </ul> 
+  
+  <h3>Issue Two</h3>
+  <ul>
+    <li><p>Issue: Passengers suspect to MongoDB Injection</p></li>
+    <li><p>Page: Found on the /passenger.json page</p></li>
+    <li><p>Severity: Medium. The site is returning somewhat sensitive data of the latitude and longitude of the passengers. By using the mongoDB operator [$ne] for username, you can return all results not equal to the search result which results in all the passengers that have been entered in.  This has potential to be a high severity, if in future iterations, it returned any private information about the users (such as credentials).</p></li>
+    <li><p>Description: This issue was talked about it in class. I also read the link on the course website about hacking-nodejs-and-mongodb. The injection was performed by querying on the url using a GET request at /passenger.json shown in the proof of vulnerability</p></li>
+    <img src="injectionProblem.PNG" alt="injectionProblem" width="1000">
+    <li><p>Proof of vulnerability: I see your grading usernames Ming!</p></li>
+    <img src="mongoDBInjection.PNG" alt="mongoDBInjection" width="1000">
+    <li><p>Resolution: A resolution to this is to use the mongo-sanitize package. This allows you to strip out any keys that start with '$' in the input, so you can pass it to MongoDB without worrying about malicious users overwriting.</p></li>
+  </ul> 
+
+  <h3>Issue Three</h3>
+  <ul>
+    <li><p>Issue: Privacy details on vehicles</p></li>
+    <li><p>Page: Found on the homepage at https://powerful-spire-36966.herokuapp.com/</p></li>
+    <li><p>Severity: Medium. This is a similar problem as issue #2, although it doesn't even require a MongoDB Injection.  The latitude and longitudes of each of the vehicles is revealed along with the exact time they were at the position.  This seems to break the privacy of vehicles.  Severity could be higher if in the future, the application decided to store more information for the vehicle owners.  Doing so could potentially allow for confidential information to be accessed with XSS manipulating the display of the HTML.</p></li>
+    <li><p>Description: This vulnerability is exposed each time the homepage is loaded.</p></li>
+    <li><p>Proof of vulnerability:</p></li>
+    <img src="vehiclePrivacy.PNG" alt="vehiclePrivacy" width="800">
+    <li><p>Resolution: This was an original requirement of the assignment, however in the future, the developer should not diplay the information of all the vehicles on the homepage of the application</p></li>
+  </ul> 
 
 	<h2>5. Conclusion</h2>
-	<p></p>
+	<p>In conclusion, this web app needs better security to take greater care for the user's information.  The most impactful change would be to always validate the user's input and also prevent sensitive data such as the user's location to be stored so it can be accessed from the client side.  In the future, these measures must be taken before deploying the site and thoroughly tested, especially if additional information for vehicles and passengers are added to the database.  I recommend that the web developers of this site to read up on basic security protocols so that as they code, they can look out for potential threats to people that use the application.</p>
 
 	<h2>6. References</h2>
-	<p></p>
+  <ul>
+    <li><p>https://tuftsdev.github.io/WebProgramming/notes/web_security.html</p></li>
+    <li><p>Class notes from Comp20 Spring 2019</p></li>
+    <li><p>https://www.veracode.com/security/xss</p></li>
+    <li><p>https://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html</p></li>
+    <li><p>https://medium.com/volosoft/running-penetration-tests-for-your-website-as-a-simple-developer-with-owasp-zap-493d6a7e182b</p></li>
+    <li><p>https://geekflare.com/http-header-implementation/</p></li>
+  </ul> 
 </body>
 </html>
